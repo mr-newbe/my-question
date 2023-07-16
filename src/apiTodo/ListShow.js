@@ -1,13 +1,13 @@
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil"
+import { useRecoilState, useRecoilValue} from "recoil"
 import { Bearer, TaskContent, projID } from "./ContentProv"
-import {useState,useEffect} from 'react';
+import {useState} from 'react';
 import axios from 'axios';
+import {v4 as uuidv4} from 'uuid';
 
 
 //task의 변경과 삭제가 이루어져야 하는 곳이다.
 export default function TaskList(){
-  const [contentArray,setContentArray] = useRecoilState(TaskContent);
-  console.log(contentArray);
+  const contentArray = useRecoilValue(TaskContent);
   console.log("tasklist open");
   return(
     <>
@@ -20,7 +20,7 @@ export default function TaskList(){
         <div>
           <br/>
           <br/>
-          <div>할일을 추가하세요! 아직 시간은 많습니다!</div>
+          <div>할일을 추가하세요! 시간은 금입니다!!</div>
         </div>  
       }
       
@@ -37,7 +37,6 @@ function TaskItem({item}){
   const [taskItem,editTaskItem] = useRecoilState(TaskContent);
 
   const bearerID = useRecoilValue(Bearer);
-  const projectID = useRecoilValue(projID);
   const index = taskItem.findIndex((listItem) => listItem===item);
 
   
@@ -91,7 +90,19 @@ function TaskItem({item}){
 
     console.log(newList);
     //미래에 통신기능을 넣도록 하겠습니다.
-    
+    const dell = taskItem[index].id;
+
+    axios.post(`https://api.todoist.com/rest/v2/tasks/${dell}`,{
+      content:`${editValue}`
+    },
+    {headers: {
+      'Content-Type' : 'application/json',
+      'Authorization': `Bearer ${bearerID}`,
+      'X-Request-Id':uuidv4(),
+    }}
+    ).then(
+      console.log("수정 성공")
+    )
   };
   
   
